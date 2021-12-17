@@ -2,7 +2,7 @@ defmodule Rockelivery.User do
   use Ecto.Schema
   import Ecto.Changeset
 
-  @primary_key {:id, :binary_id, autogerate: true}
+  @primary_key {:id, :binary_id, autogenerate: true}
   @required_fields [
     :address,
     :age,
@@ -12,6 +12,15 @@ defmodule Rockelivery.User do
     :password,
     :name
   ]
+  @derive {Jason.Encoder,
+           only: [
+             :address,
+             :age,
+             :zipcode,
+             :document,
+             :email,
+             :name
+           ]}
 
   schema "users" do
     field :address, :string
