@@ -7,6 +7,6 @@ defmodule RockeliveryWeb.FallbackController do
     conn
     |> put_status(:bad_request)
     |> put_view(ErrorView)
-    |> render("404.json", result: reason)
+    |> render("400.json", result: reason)
   end
 end

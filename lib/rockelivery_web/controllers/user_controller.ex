@@ -2,7 +2,7 @@ defmodule RockeliveryWeb.UserController do
   use RockeliveryWeb, :controller
 
   alias Rockelivery.User
-  alias Rockelivery.FallbackController
+  alias RockeliveryWeb.FallbackController
 
   action_fallback FallbackController
 
