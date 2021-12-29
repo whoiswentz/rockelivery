@@ -14,6 +14,7 @@ defmodule Rockelivery.User do
   ]
   @derive {Jason.Encoder,
            only: [
+            :id,
              :address,
              :age,
              :zipcode,
