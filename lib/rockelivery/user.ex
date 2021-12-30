@@ -12,9 +12,17 @@ defmodule Rockelivery.User do
     :password,
     :name
   ]
+  @update_fields [
+    :address,
+    :age,
+    :zipcode,
+    :document,
+    :email,
+    :name
+  ]
   @derive {Jason.Encoder,
            only: [
-            :id,
+             :id,
              :address,
              :age,
              :zipcode,
@@ -38,8 +46,18 @@ defmodule Rockelivery.User do
 
   def changeset(params) do
     %__MODULE__{}
-    |> cast(params, @required_fields)
-    |> validate_required(@required_fields)
+    |> changes(params, @required_fields)
+  end
+
+  def changeset(struct, params) do
+    struct
+    |> changes(params, @update_fields)
+  end
+
+  defp changes(changeset, params, fields) do
+    changeset
+    |> cast(params, fields)
+    |> validate_required(fields)
     |> validate_length(:password, min: 6)
     |> validate_length(:zipcode, is: 8)
     |> validate_length(:document, is: 11)

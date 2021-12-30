@@ -3,6 +3,7 @@ defmodule RockeliveryWeb.Router do
 
   pipeline :api do
     plug :accepts, ["json"]
+    plug RockeliveryWeb.Plugs.UUIDChecker
   end
 
   scope "/api", RockeliveryWeb do
