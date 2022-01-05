@@ -17,7 +17,7 @@ defmodule Rockelivery.MixProject do
         "coveralls.detail": :test,
         "coveralls.post": :test,
         "coveralls.html": :test
-    ]
+      ]
     ]
   end
 
@@ -53,7 +53,7 @@ defmodule Rockelivery.MixProject do
       {:plug_cowboy, "~> 2.5"},
       {:pbkdf2_elixir, "~> 1.4"},
       {:excoveralls, "~> 0.10", only: :test},
-      {:ex_machina, "~> 2.7.0"},
+      {:ex_machina, "~> 2.7.0"}
     ]
   end
 
