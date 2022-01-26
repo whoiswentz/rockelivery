@@ -5,13 +5,14 @@ defmodule Rockelivery.Order do
   alias Rockelivery.{User, Item}
 
   @primary_key {:id, :binary_id, autogenerate: true}
+  @foreign_key_type :binary_id
 
   @required_fields [:address, :comments, :payment_method, :user_id]
   @payment_methods [:money, :credit_card, :debit_card]
 
-  @derive {Jason.Encoder, only: @required_fields ++ [:id]}
+  @derive {Jason.Encoder, only: @required_fields ++ [:id, :items]}
 
-  schema "items" do
+  schema "orders" do
     field :address, :string
     field :comments, :string
     field :payment_method, Ecto.Enum, values: @payment_methods
