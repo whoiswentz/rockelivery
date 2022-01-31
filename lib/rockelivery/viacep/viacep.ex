@@ -3,11 +3,11 @@ defmodule Rockelivery.ViaCep do
 
   alias Rockelivery.Error
 
-  plug Tesla.Middleware.BaseUrl, "https://viacep.com.br/ws/"
+  @base_url "https://viacep.com.br/ws/"
   plug Tesla.Middleware.JSON
 
-  def get_zipcode(zipcode) do
-    "#{zipcode}/json"
+  def get_zipcode(url \\ @base_url, zipcode) do
+    "#{url}#{zipcode}/json"
     |> get()
     |> handle_get()
   end
