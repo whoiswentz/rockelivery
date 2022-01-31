@@ -1,10 +1,18 @@
 defmodule RockeliveryWeb.UserControllerTest do
   use RockeliveryWeb.ConnCase, async: true
 
+  import Mox
   import Rockelivery.Test.Support.Factories.UserFactory
+
+  alias Rockelivery.ViaCepMock
 
   describe "create/2" do
     test "when all params are valid, creates the user", %{conn: conn} do
+      expect(ViaCepMock, :get_zipcode, fn zipcode ->
+        assert zipcode == "12341234"
+        {:ok, build(:zipcode_info)}
+      end)
+
       params = build(:user_params_controller)
 
       response =
@@ -24,6 +32,11 @@ defmodule RockeliveryWeb.UserControllerTest do
     end
 
     test "when there is some error, returns the error", %{conn: conn} do
+      expect(ViaCepMock, :get_zipcode, fn zipcode ->
+        assert zipcode == "12341234"
+        {:ok, build(:zipcode_info)}
+      end)
+
       params =
         build(:user_params_controller, %{
           "age" => 15

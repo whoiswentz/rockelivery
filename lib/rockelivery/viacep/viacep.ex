@@ -2,10 +2,14 @@ defmodule Rockelivery.ViaCep do
   use Tesla
 
   alias Rockelivery.Error
+  alias Rockelivery.ViaCep
+
+  @behaviour ViaCep.Behaviour
 
   @base_url "https://viacep.com.br/ws/"
   plug Tesla.Middleware.JSON
 
+  @impl ViaCep.Behaviour
   def get_zipcode(url \\ @base_url, zipcode) do
     "#{url}#{zipcode}/json"
     |> get()

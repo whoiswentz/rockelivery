@@ -1,10 +1,10 @@
 defmodule Rockelivery.Users.Create do
-  alias Rockelivery.{User, Repo, Error, ViaCep}
+  alias Rockelivery.{User, Repo, Error}
 
   def call(%{"zipcode" => zipcode} = params) do
     changeset = User.changeset(params)
 
-    case ViaCep.get_zipcode(zipcode) do
+    case viacep().get_zipcode(zipcode) do
       {:ok, _cep_info} ->
         save_user(changeset)
 
@@ -27,5 +27,9 @@ defmodule Rockelivery.Users.Create do
 
   defp handle_insert({:error, result}) do
     {:error, Error.build(:bad_request, result)}
+  end
+
+  defp viacep do
+    Application.get_env(:rockelivery, :viacep, Rockelivery.ViaCep)
   end
 end
