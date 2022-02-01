@@ -5,6 +5,7 @@ defmodule RockeliveryWeb.UserControllerTest do
   import Rockelivery.Test.Support.Factories.UserFactory
 
   alias Rockelivery.ViaCepMock
+  alias RockeliveryWeb.Auth
 
   describe "create/2" do
     test "when all params are valid, creates the user", %{conn: conn} do
@@ -21,13 +22,16 @@ defmodule RockeliveryWeb.UserControllerTest do
         |> json_response(:created)
 
       assert %{
-               "address" => "asdasdasdasd",
-               "age" => 29,
-               "document" => "12344234147",
-               "email" => "asasd1@asdas.com",
-               "name" => "asdasda",
-               "zipcode" => "12341234",
-               "id" => _id
+               "token" => _token,
+               "user" => %{
+                 "address" => "asdasdasdasd",
+                 "age" => 29,
+                 "document" => "12344234147",
+                 "email" => "asasd1@asdas.com",
+                 "id" => _id,
+                 "name" => "asdasda",
+                 "zipcode" => "12341234"
+               }
              } = response
     end
 
@@ -56,9 +60,16 @@ defmodule RockeliveryWeb.UserControllerTest do
   end
 
   describe "delete/2" do
+    setup %{conn: conn} do
+      user = insert(:user)
+      {:ok, token, _claims} = Auth.Guardian.encode_and_sign(user)
+      conn = put_req_header(conn, "authorization", "Bearer #{token}")
+
+      {:ok, conn: conn, user: user}
+    end
+
     test "when there is a user with the given id, delete the user", %{conn: conn} do
       id = "2262789b-b631-4cb0-9b1a-62658e53ac95"
-      insert(:user)
 
       response =
         conn

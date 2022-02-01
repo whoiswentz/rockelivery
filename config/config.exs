@@ -14,8 +14,13 @@ config :rockelivery, Rockelivery.Repo,
   migration_primary_key: [type: :binary_id],
   migration_foreign_key: [type: :binary_id]
 
-# config :rockelivery, Rockelivery.Users.Create,
-#   viacep_adapter: Rockelivery.ViaCep
+config :rockelivery, RockeliveryWeb.Auth.Guardian,
+  issuer: "rockelivery",
+  secret_key: "CAC9I8Y4vc5PTO33kpV/g8OyuCqf7LaoaEuZTVaCUfzSyGK6xKTaa5+VnQxcJvBO"
+
+config :rockelivery, RockeliveryWeb.Auth.Pipeline,
+  module: RockeliveryWeb.Auth.Guardian,
+  error_handler: RockeliveryWeb.Auth.ErrorHandler
 
 # Configures the endpoint
 config :rockelivery, RockeliveryWeb.Endpoint,
