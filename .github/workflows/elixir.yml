@@ -41,9 +41,10 @@ jobs:
       run: mix deps.get
     - name: Run tests
       run: mix test
+
   deploy:
     needs: build
-    if: github.ref == 'refs/heads/main'
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
 
     runs-on: ubuntu-latest
 
@@ -57,11 +58,19 @@ jobs:
         with:
           python-version: 3.8.1
           
-      - name: Gigalixir Action
-        uses: mhanberg/gigalixir-action@v0.4.0
-        with:
-          GIGALIXIR_APP: ${{ secrets.GIGALIXIR_APP_NAME }}
-          GIGALIXIR_USERNAME: ${{ secrets.GIGALIXIR_USERNAME }}
-          GIGALIXIR_PASSWORD: ${{ secrets.GIGALIXIR_PASSWORD }}
-          MIGRATIONS: true
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      # - name: Gigalixir Action
+      #   uses: mhanberg/gigalixir-action@v0.4.0
+      #   with:
+      #     GIGALIXIR_APP: ${{ secrets.GIGALIXIR_APP_NAME }}
+      #     GIGALIXIR_USERNAME: ${{ secrets.GIGALIXIR_USERNAME }}
+      #     GIGALIXIR_PASSWORD: ${{ secrets.GIGALIXIR_PASSWORD }}
+      #     MIGRATIONS: true
+      #     SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      - name: Gigalixir CLI Install
+        run: sudo pip install gigalixir --ignore-installed six
+      - name: Gigalixir Login
+        run: gigalixir login -e "${{ secrets.GIGALIXIR_EMAIL }}" -y -p "${{ secrets.GIGALIXIR_PASSWORD }}"
+      - name: Gigalixir Git Remote
+        run: gigalixir git:remote ${{ secrets.GIGALIXIR_APP_NAME }}
+      - run: git push -f gigalixir HEAD:refs/heads/master
+
