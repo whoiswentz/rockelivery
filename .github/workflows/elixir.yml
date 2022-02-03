@@ -69,8 +69,13 @@ jobs:
       - name: Gigalixir CLI Install
         run: sudo pip install gigalixir --ignore-installed six
       - name: Gigalixir Login
-        run: gigalixir login -e "${{ secrets.GIGALIXIR_EMAIL }}" -y -p "${{ secrets.GIGALIXIR_PASSWORD }}"
+        run: gigalixir login -e "${{ secrets.GIGALIXIR_USERNAME }}" -y -p "${{ secrets.GIGALIXIR_PASSWORD }}"
       - name: Gigalixir Git Remote
         run: gigalixir git:remote ${{ secrets.GIGALIXIR_APP_NAME }}
-      - run: git push -f gigalixir HEAD:refs/heads/master
+      - name: Gigalixir Push
+        run: git push -f gigalixir HEAD:refs/heads/master
+      - name: Gigalixir Run Migration
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        run: gigalixir ps:migrate -a ${{ secrets.GIGALIXIR_APP_NAME }}
 
