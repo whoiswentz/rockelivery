@@ -8,7 +8,6 @@ on:
 
 jobs:
   build:
-
     name: Build and test
     runs-on: ubuntu-latest
 
@@ -51,31 +50,45 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          ref: main # Check out main instead of the latest commit
-          fetch-depth: 0 # Checkout the whole branch
+          ref: main
+          fetch-depth: 0
           
       - uses: actions/setup-python@v2
         with:
           python-version: 3.8.1
-          
-      # - name: Gigalixir Action
-      #   uses: mhanberg/gigalixir-action@v0.4.0
-      #   with:
-      #     GIGALIXIR_APP: ${{ secrets.GIGALIXIR_APP_NAME }}
-      #     GIGALIXIR_USERNAME: ${{ secrets.GIGALIXIR_USERNAME }}
-      #     GIGALIXIR_PASSWORD: ${{ secrets.GIGALIXIR_PASSWORD }}
-      #     MIGRATIONS: true
-      #     SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
       - name: Gigalixir CLI Install
         run: sudo pip install gigalixir --ignore-installed six
       - name: Gigalixir Login
-        run: gigalixir login -e "${{ secrets.GIGALIXIR_USERNAME }}" -y -p "${{ secrets.GIGALIXIR_PASSWORD }}"
+        run: gigalixir login -e "${{secrets.GIGALIXIR_USERNAME}}" -p "${{secrets.GIGALIXIR_PASSWORD}}" -y
       - name: Gigalixir Git Remote
-        run: gigalixir git:remote ${{ secrets.GIGALIXIR_APP_NAME }}
+        run: gigalixir git:remote ${{secrets.GIGALIXIR_APP_NAME}}
       - name: Gigalixir Push
         run: git push -f gigalixir HEAD:refs/heads/master
-      - name: Gigalixir Run Migration
+      - name: Wait to be Healthy
+        run: |
+          echo "GIGALIXIR POD STATUS CHECK"
+          for (( ; ; )) do
+            echo "Checking the healthy of the pod..."
+            export IS_HEALTHY=$(gigalixir ps | python3 -c "import sys, json; print(json.load(sys.stdin)['pods'][-1]['status'])")
+            echo $IS_HEALTHY
+            if [ $IS_HEALTHY == "Healthy" ] 
+            then
+              break
+            fi
+            sleep 2
+          done
+      - name: Setup ssh
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        run: |
+          mkdir ~/.ssh
+          touch ~/.ssh/config
+
+          printf "Host *\n StrictHostKeyChecking no" > ~/.ssh/config
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+
+          chmod 0600 ~/.ssh/id_rsa
+          chmod 0700 ~/.ssh
+      - name: Gigalixir Run Migration
         run: gigalixir ps:migrate -a ${{ secrets.GIGALIXIR_APP_NAME }}
 
